@@ -45,6 +45,5 @@ export const setupCommands = async ({
             continue;
         }
     }
-    log.debug('Loaded commands: ' + Object.keys(commandDefs).join(', '));
     return { commandDefs, commandHandlers };
 };

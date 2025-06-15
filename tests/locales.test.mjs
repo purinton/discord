@@ -17,22 +17,29 @@ describe('setupLocales', () => {
     };
   });
 
-  test('loads locales from files', () => {
-    setupLocales({ localesDir: '/locales', log, fsLib: mockFs });
+  test('loads locales from files and returns loadedLocales', () => {
+    const result = setupLocales({ localesDir: '/locales', log, fsLib: mockFs });
     expect(locales['en-US'].greet).toBe('Hello');
     expect(locales['fr'].greet).toBe('Bonjour');
+    expect(result.loadedLocales).toContain('en-US');
+    expect(result.loadedLocales).toContain('fr');
+    expect(typeof result.msg).toBe('function');
   });
 
   test('handles missing directory', () => {
     mockFs.readdirSync.mockImplementation(() => { throw new Error('fail'); });
-    setupLocales({ localesDir: '/bad', log, fsLib: mockFs });
+    const result = setupLocales({ localesDir: '/bad', log, fsLib: mockFs });
     expect(log.error).toHaveBeenCalledWith(expect.stringContaining('Failed to read locales directory'), expect.any(Error));
+    expect(result.loadedLocales).toEqual([]);
+    expect(typeof result.msg).toBe('function');
   });
 
   test('handles bad JSON', () => {
     mockFs.readFileSync.mockImplementation(() => '{bad json');
-    setupLocales({ localesDir: '/locales', log, fsLib: mockFs });
+    const result = setupLocales({ localesDir: '/locales', log, fsLib: mockFs });
     expect(log.error).toHaveBeenCalledWith(expect.stringContaining('Failed to load or parse locale file'), expect.any(Error));
+    expect(result.loadedLocales).toEqual([]); // No locales loaded if all JSON is bad
+    expect(typeof result.msg).toBe('function');
   });
 });
 

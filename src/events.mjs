@@ -12,7 +12,7 @@ import { readdirSync } from 'fs';
  * @param {Object} [options.commands] - Commands map (optional)
  * @param {Object} [options.fsLib] - File system library (for testing)
  * @param {Function} [options.importFn] - Function to import handlers (for testing)
- * @returns {Promise<string[]>} Array of loaded event names
+ * @returns {Promise<{ loadedEvents: string[] }>} Object with loadedEvents array
  */
 export const setupEvents = async ({
     client,
@@ -33,15 +33,16 @@ export const setupEvents = async ({
         try {
             const mod = await importFn(pathUrl(eventsDir, file));
             if (!client) throw new Error('Discord client is undefined');
-            if (typeof mod.default === 'function' && mod.default.length >= 2) {
-                client.on(eventName, (...eventArgs) => mod.default({ ...eventArgs, msg, commandHandlers }));
-            } else {
-                client.on(eventName, mod.default);
+            if (typeof mod.default === 'function') {
+                client.on(eventName, (...eventArgs) => {
+                    // Pass the Discord client, logger, localization function, and commands to the handler context
+                    mod.default({ client, log, msg, commandHandlers, ...eventArgs });
+                });
             }
             loadedEvents.push(eventName);
         } catch (err) {
             log.error(`Failed to load event ${eventName}:`, err);
         }
     }
-    return loadedEvents;
+    return { loadedEvents };
 };

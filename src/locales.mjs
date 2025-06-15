@@ -13,12 +13,12 @@ export const msg = (locale, key, defaultValue = 'A serious error occurred.', log
         log.error(`Default locale "en-US" not found. Returning default value.`);
         return defaultValue;
     }
-    const msg = locales[locale][key];
-    if (msg === undefined) {
+    const message = locales[locale][key];
+    if (message === undefined) {
         log.warn(`Key "${key}" not found in locale "${locale}", returning default value.`);
         return defaultValue;
     }
-    return msg;
+    return message;
 };
 
 export const setupLocales = ({
@@ -26,13 +26,14 @@ export const setupLocales = ({
     log = logger,
     fsLib = { readdirSync, readFileSync },
 } = {}) => {
+    let loadedLocales = [];
     try {
         let files;
         try {
             files = fsLib.readdirSync(localesDir).filter(f => f.endsWith('.json'));
         } catch (err) {
             log.error(`Failed to read locales directory: ${localesDir}`, err);
-            return;
+            return { msg, loadedLocales };
         }
         for (const file of files) {
             try {
@@ -42,9 +43,11 @@ export const setupLocales = ({
                 log.error(`Failed to load or parse locale file ${file}:`, err);
             }
         }
+        loadedLocales = Object.keys(locales);
     } catch (err) {
         log.error('Unexpected error in loadLocales:', err);
     }
+    return { msg, loadedLocales };
 };
 
 export const clearLocales = () => {

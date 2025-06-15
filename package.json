@@ -2,7 +2,7 @@
     "name": "@purinton/discord",
     "type": "module",
     "version": "1.0.0",
-    "description": "A Node.js discord.",
+    "description": "A Discord.js module with dynamic drop-in events, locales, and /commands.",
     "module": "index.mjs",
     "types": "index.d.ts",
     "files": [
@@ -31,8 +31,17 @@
         "url": "git+https://github.com/purinton/discord.git"
     },
     "keywords": [
+        "nodejs",
+        "template",
+        "node",
+        "framework",
         "discord",
-        "nodejs"
+        "discordjs",
+        "discord-bot",
+        "node-js",
+        "discord-js",
+        "discord-bot-framework",
+        "discord-bot-template"
     ],
     "author": "Russell Purinton <russell@purinton.us>",
     "license": "MIT",

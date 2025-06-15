@@ -13,7 +13,7 @@ describe('setupEvents', () => {
   });
 
   test('loads event handlers and attaches to client', async () => {
-    const loadedEvents = await setupEvents({
+    const { loadedEvents } = await setupEvents({
       client,
       eventsDir: '/events',
       log,

@@ -1,4 +1,4 @@
-import { myModule } from './index.mjs';
+import { myModule } from '@purinton/discord';
 import { jest, test, expect } from '@jest/globals';
 
 test('myModule returns expected string', () => {

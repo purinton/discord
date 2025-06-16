@@ -1,7 +1,7 @@
 {
     "name": "@purinton/discord",
     "type": "module",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "A modular, extensible Discord app framework for Node.js with slash command, localization, and event-driven support.",
     "module": "index.mjs",
     "types": "index.d.ts",

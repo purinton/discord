@@ -96,7 +96,13 @@ export const registerCommands = async ({
         log.debug(`Registered ${commandDefs.length} commands successfully.`);
         return true;
     } catch (error) {
-        log.error('Failed to register commands:', error);
+        if (error && error.status === 401) {
+            log.error('Failed to register commands: Unauthorized (401). Please check your Discord token and client ID.');
+        } else if (error && error.status === 403) {
+            log.error('Failed to register commands: Forbidden (403). The bot may lack permissions.');
+        } else {
+            log.error('Failed to register commands:', error.message || error);
+        }
         return false;
     }
 };

@@ -152,7 +152,9 @@ For help, questions, or to chat with the author and community, visit:
 
 ## Links
 
-- [GitHub](https://github.com/purinton/discord)
+- [GitHub (Module)](https://github.com/purinton/discord)
+- [GitHub (Org)](https://github.com/purinton)
+- [GitHub (Personal)](https://github.com/rpurinton)
 - [npm](https://www.npmjs.com/package/@purinton/discord)
 - [Discord](https://discord.gg/QSBxQnX7PF)
 

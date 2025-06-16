@@ -18,6 +18,7 @@ import { setupLocales } from './src/locales.mjs';
  * @param {string} [options.eventsDir] - Directory path for events (overrides rootDir)
  * @param {Object} [options.intents] - Object with boolean flags for Discord Gateway Intents (e.g., { Guilds: true, GuildMessages: true })
  * @param {Array<string>} [options.partials] - Array of partials for the Discord client
+ * @param {Object} [options.context] - Context object to pass to event handlers and commands
  * @param {Object} [options.clientOptions] - Additional options for Discord client
  * @param {Function} [options.ClientClass] - Discord client class (for dependency injection/testing)
  * @param {Function} [options.setupEventsFn] - Function to set up events (for dependency injection/testing)
@@ -43,6 +44,7 @@ export const createDiscord = async ({
     GuildVoiceStates: false
   },
   partials = ['MESSAGE', 'CHANNEL', 'REACTION'],
+  context = {},
   clientOptions = {},
   ClientClass = Client,
   setupEventsFn = setupEvents,
@@ -80,8 +82,8 @@ export const createDiscord = async ({
   if (!registerSuccess) throw new Error('Failed to register commands with Discord API. Please check your command definitions and token.');
   log.debug(`Loaded ${commandDefs.length} commands...`);
 
-  const { loadedEvents } = await setupEventsFn({ client, eventsDir, log, msg, commandHandlers });
-  log.debug(`Loaded ${loadedEvents.length} events...`);
+  const { loadedEvents } = await setupEventsFn({ client, eventsDir, log, msg, commandHandlers, context });
+  log.info(`Loaded ${loadedEvents.length} events...`);
 
   try {
     await client.login(token);

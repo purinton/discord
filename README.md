@@ -101,7 +101,7 @@ Creates and logs in a Discord client, auto-registers commands, loads event handl
 **Options:**
 
 - `client_id` (string): Discord application client ID (required)
-- `token` (string): Discord app token (required)
+- `token` (string): Discord bot token (required)
 - `log` (Logger): Logger instance (optional)
 - `rootDir` (string): Root directory for events, commands, and locales (default: autodetect)
 - `localesDir` (string): Directory for locale files (default: `<rootDir>/locales`)
@@ -112,6 +112,7 @@ Creates and logs in a Discord client, auto-registers commands, loads event handl
 - `clientOptions` (object): Additional Discord.js client options
 - `ClientClass` (constructor): Custom Discord.js Client class (for testing)
 - `setupEventsFn`, `setupCommandsFn`, `registerCommandsFn`, `setupLocalesFn`: Dependency injection for advanced use/testing
+- `context` (object): Additional arbitrary data to be injected into all event and command handlers
 
 Returns: A logged-in Discord.js `Client` instance.
 

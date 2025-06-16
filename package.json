@@ -67,8 +67,7 @@
         ]
     },
     "dependencies": {
-        "@purinton/log": "^1.0.10",
-        "@purinton/path": "^1.0.12",
+        "@purinton/common": "^1.0.14",
         "discord.js": "^14.20.0",
         "dotenv": "^16.5.0"
     }

@@ -24,6 +24,7 @@ export interface CreateDiscordOptions {
     [key: string]: boolean | undefined;
   };
   partials?: string[];
+  context?: Record<string, any>;
   clientOptions?: ClientOptions;
   ClientClass?: typeof Client;
   setupEventsFn?: (options: any) => Promise<any>;

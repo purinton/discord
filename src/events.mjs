@@ -23,6 +23,7 @@ export const setupEvents = async ({
         return defaultMsg || 'An error occurred.';
     },
     commandHandlers = {},
+    context = {},
     fsLib = { readdirSync },
     importFn = (p) => import(p),
 } = {}) => {
@@ -35,9 +36,9 @@ export const setupEvents = async ({
             if (!client) throw new Error('Discord client is undefined');
             if (typeof handler.default === 'function') {
                 client.on(eventName, (...eventArgs) => {
-                    const context = { client, log, msg };
-                    if (eventName === 'interactionCreate') context.commandHandlers = commandHandlers;
-                    handler.default(context, ...eventArgs);
+                    const handlerContext = { client, log, msg, ...context };
+                    if (eventName === 'interactionCreate') handlerContext.commandHandlers = commandHandlers;
+                    handler.default(handlerContext, ...eventArgs);
                 });
             }
             loadedEvents.push(eventName);

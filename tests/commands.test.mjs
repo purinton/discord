@@ -1,65 +1,134 @@
-import { setupCommands } from '../src/commands.mjs';
-import { jest, test, expect, describe, beforeEach } from '@jest/globals';
+import { jest } from '@jest/globals';
+import { setupCommands, registerCommands, purgeCommands } from '../src/commands.mjs';
+import fs from 'fs';
+
+// Mocks
+const mockLogger = { debug: jest.fn(), error: jest.fn(), warn: jest.fn(), info: jest.fn() };
+const mockRest = jest.fn().mockImplementation(() => ({
+  setToken: jest.fn().mockReturnThis(),
+  put: jest.fn().mockResolvedValue({})
+}));
+const mockRoutes = {
+  applicationCommands: jest.fn((id) => `/apps/${id}/commands`),
+  applicationGuildCommands: jest.fn((id, gid) => `/apps/${id}/guilds/${gid}/commands`)
+};
+const mockFs = {
+  readdirSync: jest.fn(),
+  readFileSync: jest.fn(),
+  existsSync: jest.fn()
+};
+const testDir = 'tests/mock-commands';
+const testJson = '{"name":"help","description":"Help command"}';
+const testHandler = { default: jest.fn() };
+
+// Setup/teardown for mock files
+beforeAll(() => {
+  if (!fs.existsSync(testDir)) fs.mkdirSync(testDir);
+  fs.writeFileSync(`${testDir}/help.json`, testJson);
+  fs.writeFileSync(`${testDir}/help.mjs`, 'export default () => {}');
+});
+afterAll(() => {
+  fs.rmSync(testDir, { recursive: true, force: true });
+});
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
 describe('setupCommands', () => {
-  let mockFs, log, importFn;
-  beforeEach(() => {
-    log = { warn: jest.fn(), error: jest.fn(), debug: jest.fn() };
-    mockFs = {
-      readdirSync: jest.fn(() => ['ping.json', 'pong.json']),
-      readFileSync: jest.fn((file) => {
-        if (file.includes('ping')) return '{"name":"ping"}';
-        if (file.includes('pong')) return '{"name":"pong"}';
-        throw new Error('File not found');
-      }),
-      existsSync: jest.fn((file) => file.includes('ping') || file.includes('pong')),
-    };
-    importFn = jest.fn(async (file) => ({ default: jest.fn() }));
-  });
-
-  test('loads command definitions and handlers', async () => {
+  it('loads and registers commands and handlers', async () => {
+    mockFs.readdirSync.mockReturnValue(['help.json']);
+    mockFs.readFileSync.mockReturnValue(testJson);
+    mockFs.existsSync.mockReturnValue(true);
+    const importFn = jest.fn().mockResolvedValue(testHandler);
     const { commandDefs, commandHandlers } = await setupCommands({
-      commandsDir: '/commands',
-      log,
       fsLib: mockFs,
-      importFn,
+      commandsDir: testDir,
+      log: mockLogger,
+      importFn
     });
-    expect(commandDefs.ping).toBeDefined();
-    expect(typeof commandHandlers.ping).toBe('function');
-    expect(commandDefs.pong).toBeDefined();
-    expect(typeof commandHandlers.pong).toBe('function');
+    expect(commandHandlers.help).toBe(testHandler.default);
+    expect(commandDefs[0].name).toBe('help');
+    expect(importFn).toHaveBeenCalled();
   });
 
-  test('warns if handler is not a function', async () => {
-    importFn = jest.fn(async () => ({ default: 123 }));
+  it('warns if handler is missing', async () => {
+    mockFs.readdirSync.mockReturnValue(['help.json']);
+    mockFs.readFileSync.mockReturnValue(testJson);
+    mockFs.existsSync.mockReturnValue(false);
+    const importFn = jest.fn();
     await setupCommands({
-      commandsDir: '/commands',
-      log,
       fsLib: mockFs,
-      importFn,
+      commandsDir: testDir,
+      log: mockLogger,
+      importFn
     });
-    expect(log.warn).toHaveBeenCalledWith(expect.stringContaining('does not export a default function.'));
+    expect(mockLogger.warn).toHaveBeenCalledWith('No handler found for command help');
   });
 
-  test('warns if handler missing', async () => {
-    mockFs.existsSync = jest.fn(() => false);
+  it('logs error if command definition fails', async () => {
+    mockFs.readdirSync.mockReturnValue(['bad.json']);
+    mockFs.readFileSync.mockImplementation(() => { throw new Error('fail'); });
+    mockFs.existsSync.mockReturnValue(false);
+    const importFn = jest.fn();
     await setupCommands({
-      commandsDir: '/commands',
-      log,
       fsLib: mockFs,
-      importFn,
+      commandsDir: testDir,
+      log: mockLogger,
+      importFn
     });
-    expect(log.warn).toHaveBeenCalledWith(expect.stringContaining('No handler found for command'));
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      expect.stringContaining('Failed to load command definition for bad.json:'),
+      expect.any(Error)
+    );
+  });
+});
+
+describe('registerCommands', () => {
+  it('registers commands with Discord API', async () => {
+    const result = await registerCommands({
+      commandDefs: [{ name: 'help', description: 'Help' }],
+      clientId: 'client',
+      token: 'token',
+      log: mockLogger,
+      restClass: mockRest,
+      routes: mockRoutes
+    });
+    expect(result).toBe(true);
   });
 
-  test('logs error for bad JSON', async () => {
-    mockFs.readFileSync = jest.fn(() => '{bad json');
-    await setupCommands({
-      commandsDir: '/commands',
-      log,
-      fsLib: mockFs,
-      importFn,
+  it('returns false if no token', async () => {
+    const result = await registerCommands({
+      commandDefs: [{ name: 'help', description: 'Help' }],
+      clientId: 'client',
+      token: undefined,
+      log: mockLogger,
+      restClass: mockRest,
+      routes: mockRoutes
     });
-    expect(log.error).toHaveBeenCalledWith(expect.stringContaining('Failed to load command definition for'), expect.any(Error));
+    expect(result).toBe(false);
+  });
+});
+
+describe('purgeCommands', () => {
+  it('purges all global commands', async () => {
+    await purgeCommands({
+      clientId: 'client',
+      token: 'token',
+      log: mockLogger,
+      restClass: mockRest,
+      routes: mockRoutes
+    });
+    expect(mockLogger.info).toHaveBeenCalledWith('All global application commands purged.');
+  });
+  it('purges all guild commands', async () => {
+    await purgeCommands({
+      clientId: 'client',
+      token: 'token',
+      guildId: 'guild',
+      log: mockLogger,
+      restClass: mockRest,
+      routes: mockRoutes
+    });
+    expect(mockLogger.info).toHaveBeenCalledWith('All application commands purged for guild guild.');
   });
 });

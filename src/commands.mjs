@@ -6,12 +6,14 @@ import { Routes } from 'discord.js';
 
 /**
  * Loads and registers Discord commands from JSON files and their handlers.
- * @param {Object} options
+ * @param {Object} options - Options for setting up commands
+ * @param {Object} options.client - Discord client instance (optional, may be used by handlers)
  * @param {string} options.commandsDir - Directory path for commands
- * @param {Object} options.log - Logger instance
+ * @param {Object} [options.log] - Logger instance
+ * @param {string} [options.msg] - Optional message or context
  * @param {Object} [options.fsLib] - File system library (for testing)
  * @param {Function} [options.importFn] - Function to import handlers (for testing)
- * @returns {Promise<Object>} Map of command names to handler functions
+ * @returns {Promise<{commandDefs: Array, commandHandlers: Object}>} Map of command names to handler functions and command definitions
  */
 export const setupCommands = async ({
     client,
@@ -55,11 +57,11 @@ export const setupCommands = async ({
 
 /**
  * Registers Discord commands with the Discord API.
- * @param {Object} options
+ * @param {Object} options - Options for registering commands
  * @param {Array} options.commandDefs - Array of command definitions
- * @param {string} options.clientId - Discord client ID
- * @param {string} options.token - Discord bot token
- * @param {Object} options.log - Logger instance
+ * @param {string} [options.clientId] - Discord client ID
+ * @param {string} [options.token] - Discord app token
+ * @param {Object} [options.log] - Logger instance
  * @param {Object} [options.restClass=REST] - REST class (for testing)
  * @param {Object} [options.routes=Routes] - Discord.js Routes (for testing)
  * @returns {Promise<boolean>} True if registration succeeded, false otherwise
@@ -98,3 +100,37 @@ export const registerCommands = async ({
         return false;
     }
 };
+
+
+/**
+ * Purges all global and (optionally) guild-specific application commands.
+ * @param {Object} options - Options for purging commands
+ * @param {string} [options.clientId] - Discord client ID
+ * @param {string} [options.token] - Discord app token
+ * @param {string|null} [options.guildId] - Guild ID to purge (optional)
+ * @param {Object} [options.log] - Logger instance
+ * @param {Object} [options.restClass=REST] - REST class
+ * @param {Object} [options.routes=Routes] - Discord.js Routes
+ * @returns {Promise<void>}
+ */
+export async function purgeCommands({
+    clientId = process.env.DISCORD_CLIENT_ID,
+    token = process.env.DISCORD_TOKEN,
+    guildId = process.env.DISCORD_GUILD_ID || null,
+    log = logger,
+    restClass = REST,
+    routes = Routes
+}) {
+    if (!token || !clientId) {
+        log.error('DISCORD_TOKEN and DISCORD_CLIENT_ID must be set in your environment.');
+        throw new Error('Missing credentials');
+    }
+    const rest = new restClass({ version: '10' }).setToken(token);
+    if (guildId) {
+        await rest.put(routes.applicationGuildCommands(clientId, guildId), { body: [] });
+        log.info(`All application commands purged for guild ${guildId}.`);
+    } else {
+        await rest.put(routes.applicationCommands(clientId), { body: [] });
+        log.info('All global application commands purged.');
+    }
+}

@@ -2,7 +2,7 @@
     "name": "@purinton/discord",
     "type": "module",
     "version": "1.0.0",
-    "description": "A Discord.js module with dynamic drop-in events, locales, and /commands.",
+    "description": "A modular, extensible Discord app framework for Node.js with slash command, localization, and event-driven support.",
     "module": "index.mjs",
     "types": "index.d.ts",
     "files": [
@@ -31,17 +31,23 @@
         "url": "git+https://github.com/purinton/discord.git"
     },
     "keywords": [
+        "discord",
+        "discord-app",
+        "discordjs",
+        "discord-js",
+        "discord-app-framework",
+        "discord-app-template",
+        "slash-commands",
+        "localization",
+        "i18n",
+        "event-driven",
         "nodejs",
-        "template",
         "node",
         "framework",
-        "discord",
-        "discordjs",
-        "discord-bot",
-        "node-js",
-        "discord-js",
-        "discord-bot-framework",
-        "discord-bot-template"
+        "typescript",
+        "app",
+        "modular",
+        "extensible"
     ],
     "author": "Russell Purinton <russell@purinton.us>",
     "license": "MIT",
@@ -63,7 +69,7 @@
     "dependencies": {
         "@purinton/log": "^1.0.10",
         "@purinton/path": "^1.0.12",
-        "discord.js": "^14.19.3",
+        "discord.js": "^14.20.0",
         "dotenv": "^16.5.0"
     }
 }

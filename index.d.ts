@@ -4,11 +4,13 @@
 // TypeScript Version: 4.5
 
 import type { Client, ClientOptions } from 'discord.js';
+import type { Logger } from '@purinton/log';
 
 export interface CreateDiscordOptions {
   client_id?: string;
   token?: string;
-  log?: any;
+  log?: Logger;
+  rootDir?: string;
   localesDir?: string;
   commandsDir?: string;
   eventsDir?: string;
@@ -24,9 +26,15 @@ export interface CreateDiscordOptions {
   partials?: string[];
   clientOptions?: ClientOptions;
   ClientClass?: typeof Client;
-  setupEventsFn?: Function;
-  setupCommandsFn?: Function;
-  setupLocalesFn?: Function;
+  setupEventsFn?: (options: any) => Promise<any>;
+  setupCommandsFn?: (options: any) => Promise<any>;
+  registerCommandsFn?: (options: any) => Promise<boolean>;
+  setupLocalesFn?: (options: any) => any;
 }
 
+/**
+ * Creates and logs in a Discord client, allowing dependency injection for testability.
+ * @param options Configuration options for the Discord client
+ * @returns Promise resolving to a Discord.js Client instance
+ */
 export function createDiscord(options?: CreateDiscordOptions): Promise<Client>;

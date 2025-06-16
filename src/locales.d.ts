@@ -1,10 +1,13 @@
-// Type definitions for locales setup
+// Type definitions for locales setup and management
 import type { Logger } from '@purinton/log';
 
 export interface SetupLocalesOptions {
   localesDir?: string;
   log?: Logger;
-  fsLib?: any;
+  fsLib?: {
+    readdirSync: (...args: any[]) => string[];
+    readFileSync: (...args: any[]) => string;
+  };
 }
 
 export interface Locales {
@@ -16,7 +19,22 @@ export interface SetupLocalesResult {
   loadedLocales: string[];
 }
 
+/**
+ * Loads all locale files from the specified directory into memory.
+ */
 export function setupLocales(options?: SetupLocalesOptions): SetupLocalesResult;
+
+/**
+ * Clears all loaded locales from memory.
+ */
 export function clearLocales(): void;
+
+/**
+ * Retrieves a localized message for a given locale and key.
+ */
 export function msg(locale: string, key: string, defaultValue?: string, log?: Logger): string;
+
+/**
+ * In-memory object containing all loaded locales.
+ */
 export const locales: Locales;

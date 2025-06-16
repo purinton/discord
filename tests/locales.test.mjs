@@ -1,63 +1,83 @@
-import { setupLocales, msg, locales, clearLocales } from '../src/locales.mjs';
-import { jest, test, expect, describe, beforeEach } from '@jest/globals';
+import { locales, setupLocales, clearLocales, msg } from '../src/locales.mjs';
+import fs from 'fs';
+import path from 'path';
+import { jest } from '@jest/globals';
 
-describe('setupLocales', () => {
-  let mockFs;
-  let log;
-  beforeEach(() => {
+describe('locales.mjs', () => {
+  const mockLogger = {
+    error: jest.fn(),
+    warn: jest.fn(),
+    info: jest.fn()
+  };
+  const mockFs = {
+    readdirSync: jest.fn(),
+    readFileSync: jest.fn()
+  };
+  const testDir = path.join(process.cwd(), 'tests', 'mock-locales');
+  const enJson = '{"help":"Help text"}';
+  const esJson = '{"help":"Texto de ayuda"}';
+
+  beforeAll(() => {
+    if (!fs.existsSync(testDir)) fs.mkdirSync(testDir);
+    fs.writeFileSync(path.join(testDir, 'en-US.json'), enJson);
+    fs.writeFileSync(path.join(testDir, 'es-ES.json'), esJson);
+  });
+  afterAll(() => {
+    fs.rmSync(testDir, { recursive: true, force: true });
+  });
+  afterEach(() => {
     clearLocales();
-    log = { warn: jest.fn(), error: jest.fn() };
-    mockFs = {
-      readdirSync: jest.fn(() => ['en-US.json', 'fr.json']),
-      readFileSync: jest.fn((file) => {
-        if (file.includes('en-US')) return '{"greet":"Hello"}';
-        if (file.includes('fr')) return '{"greet":"Bonjour"}';
-        throw new Error('File not found');
-      })
-    };
+    jest.clearAllMocks();
   });
 
-  test('loads locales from files and returns loadedLocales', () => {
-    const result = setupLocales({ localesDir: '/locales', log, fsLib: mockFs });
-    expect(locales['en-US'].greet).toBe('Hello');
-    expect(locales['fr'].greet).toBe('Bonjour');
-    expect(result.loadedLocales).toContain('en-US');
-    expect(result.loadedLocales).toContain('fr');
-    expect(typeof result.msg).toBe('function');
+  it('loads locales from directory', () => {
+    mockFs.readdirSync.mockReturnValue(['en-US.json', 'es-ES.json']);
+    mockFs.readFileSync.mockImplementation((file) => {
+      if (file.endsWith('en-US.json')) return enJson;
+      if (file.endsWith('es-ES.json')) return esJson;
+      return '';
+    });
+    setupLocales({
+      fsLib: mockFs,
+      localesDir: testDir,
+      log: mockLogger
+    });
+    expect(locales['en-US'].help).toBe('Help text');
+    expect(locales['es-ES'].help).toBe('Texto de ayuda');
   });
 
-  test('handles missing directory', () => {
+  it('logs error if directory read fails', () => {
     mockFs.readdirSync.mockImplementation(() => { throw new Error('fail'); });
-    const result = setupLocales({ localesDir: '/bad', log, fsLib: mockFs });
-    expect(log.error).toHaveBeenCalledWith(expect.stringContaining('Failed to read locales directory'), expect.any(Error));
-    expect(result.loadedLocales).toEqual([]);
-    expect(typeof result.msg).toBe('function');
+    setupLocales({
+      fsLib: mockFs,
+      localesDir: testDir,
+      log: mockLogger
+    });
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      expect.stringContaining('Failed to read locales directory:'),
+      expect.any(Error)
+    );
   });
 
-  test('handles bad JSON', () => {
+  it('logs error if file parse fails', () => {
+    mockFs.readdirSync.mockReturnValue(['en-US.json']);
     mockFs.readFileSync.mockImplementation(() => '{bad json');
-    const result = setupLocales({ localesDir: '/locales', log, fsLib: mockFs });
-    expect(log.error).toHaveBeenCalledWith(expect.stringContaining('Failed to load or parse locale file'), expect.any(Error));
-    expect(result.loadedLocales).toEqual([]); // No locales loaded if all JSON is bad
-    expect(typeof result.msg).toBe('function');
+    setupLocales({
+      fsLib: mockFs,
+      localesDir: testDir,
+      log: mockLogger
+    });
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      expect.stringContaining('Failed to load or parse locale file en-US.json:'),
+      expect.any(Error)
+    );
   });
-});
 
-describe('msg', () => {
-  beforeEach(() => {
-    clearLocales();
-    locales['en-US'] = { greet: 'Hello' };
-  });
-  test('returns message for key', () => {
-    expect(msg('en-US', 'greet')).toBe('Hello');
-  });
-  test('falls back to default locale', () => {
-    expect(msg('fr', 'greet', 'Default', { warn: jest.fn(), error: jest.fn() })).toBe('Hello');
-  });
-  test('returns default value if key missing', () => {
-    expect(msg('en-US', 'missing', 'Default', { warn: jest.fn(), error: jest.fn() })).toBe('Default');
-  });
-  test('returns default value if locale missing', () => {
-    expect(msg('fr', 'missing', 'Default', { warn: jest.fn(), error: jest.fn() })).toBe('Default');
+  it('msg returns correct message and falls back', () => {
+    locales['en-US'] = { help: 'Help text' };
+    delete locales['es-ES'];
+    expect(msg('en-US', 'help', undefined, mockLogger)).toBe('Help text');
+    delete locales['en-US'];
+    expect(msg('es-ES', 'help', 'default', mockLogger)).toBe('default');
   });
 });

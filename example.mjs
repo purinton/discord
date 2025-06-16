@@ -6,7 +6,6 @@ import { createDiscord } from '@purinton/discord';
 
 (async () => {
     try {
-        // Use rootDir for all subdirectories
         await createDiscord({
             client_id: process.env.DISCORD_CLIENT_ID,
             token: process.env.DISCORD_TOKEN,
@@ -19,6 +18,6 @@ import { createDiscord } from '@purinton/discord';
             log
         });
     } catch (err) {
-        log.error('Failed to start bot:', err);
+        log.error('Failed to start app:', err);
     }
 })();

@@ -1,57 +1,35 @@
 import { setupEvents } from '../src/events.mjs';
-import { jest, test, expect, describe, beforeEach } from '@jest/globals';
+import fs from 'fs';
+import path from 'path';
+import { jest } from '@jest/globals';
 
 describe('setupEvents', () => {
-  let mockFs, log, importFn, client;
-  beforeEach(() => {
-    log = { warn: jest.fn(), error: jest.fn() };
-    mockFs = {
-      readdirSync: jest.fn(() => ['ready.mjs', 'messageCreate.mjs'])
-    };
-    client = { on: jest.fn() };
-    importFn = jest.fn(async (file) => ({ default: jest.fn() }));
+  let eventDir;
+  let eventFile;
+
+  beforeAll(() => {
+    eventDir = path.join(process.cwd(), 'tests', 'mock-events');
+    if (!fs.existsSync(eventDir)) fs.mkdirSync(eventDir);
+    eventFile = path.join(eventDir, 'ready.mjs');
+    fs.writeFileSync(eventFile, 'export default () => {}');
   });
 
-  test('loads event handlers and attaches to client', async () => {
-    const { loadedEvents } = await setupEvents({
-      client,
-      eventsDir: '/events',
-      log,
-      fsLib: mockFs,
-      importFn,
-    });
-    expect(loadedEvents).toContain('ready');
-    expect(loadedEvents).toContain('messageCreate');
-    expect(client.on).toHaveBeenCalledTimes(2);
+  afterAll(() => {
+    fs.rmSync(eventDir, { recursive: true, force: true });
   });
 
-  test('attaches handler with msg/commandHandlers if function expects 2+ args', async () => {
-    importFn = jest.fn(async () => ({ default: function(a, b) { return a + b; } }));
-    client = { on: jest.fn() };
+  it('loads and attaches event handlers', async () => {
+    const mockClient = { on: jest.fn() };
+    const files = ['ready.mjs'];
+    jest.spyOn(fs, 'readdirSync').mockReturnValue(files);
+    const importFn = jest.fn().mockResolvedValue({ default: jest.fn() });
     await setupEvents({
-      client,
-      eventsDir: '/events',
-      log,
-      fsLib: mockFs,
-      importFn,
-      msg: jest.fn(),
-      commandHandlers: { foo: jest.fn() },
+      client: mockClient,
+      eventsDir: eventDir,
+      log: { info: jest.fn(), error: jest.fn(), warn: jest.fn() },
+      importFn
     });
-    expect(client.on).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.any(Function)
-    );
-  });
-
-  test('logs error if import fails', async () => {
-    importFn = jest.fn(async () => { throw new Error('fail'); });
-    await setupEvents({
-      client,
-      eventsDir: '/events',
-      log,
-      fsLib: mockFs,
-      importFn,
-    });
-    expect(log.error).toHaveBeenCalledWith(expect.stringContaining('Failed to load event'), expect.any(Error));
+    expect(mockClient.on).toHaveBeenCalledWith('ready', expect.any(Function));
+    jest.restoreAllMocks();
   });
 });

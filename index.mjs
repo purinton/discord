@@ -10,20 +10,21 @@ import { setupLocales } from './src/locales.mjs';
  *
  * @param {Object} options - Configuration options
  * @param {string} [options.client_id] - Discord application client ID
- * @param {string} [options.token] - Discord bot token
+ * @param {string} [options.token] - Discord app token
  * @param {Object} [options.log] - Logger instance
  * @param {string} [options.rootDir] - Root directory for events, commands, and locales
  * @param {string} [options.localesDir] - Directory path for locales (overrides rootDir)
  * @param {string} [options.commandsDir] - Directory path for commands (overrides rootDir)
  * @param {string} [options.eventsDir] - Directory path for events (overrides rootDir)
  * @param {Object} [options.intents] - Object with boolean flags for Discord Gateway Intents (e.g., { Guilds: true, GuildMessages: true })
- * @param {Array} [options.partials] - Array of partials for the Discord client
+ * @param {Array<string>} [options.partials] - Array of partials for the Discord client
  * @param {Object} [options.clientOptions] - Additional options for Discord client
  * @param {Function} [options.ClientClass] - Discord client class (for dependency injection/testing)
  * @param {Function} [options.setupEventsFn] - Function to set up events (for dependency injection/testing)
  * @param {Function} [options.setupCommandsFn] - Function to set up commands (for dependency injection/testing)
+ * @param {Function} [options.registerCommandsFn] - Function to register commands (for dependency injection/testing)
  * @param {Function} [options.setupLocalesFn] - Function to set up locales (for dependency injection/testing)
- * @returns {Promise<Object>} Discord client instance
+ * @returns {Promise<import('discord.js').Client>} Discord client instance
  */
 export const createDiscord = async ({
   client_id = process.env.DISCORD_CLIENT_ID,

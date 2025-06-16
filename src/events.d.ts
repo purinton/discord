@@ -1,4 +1,4 @@
-// Type definitions for event setup
+// Type definitions for event setup and registration
 import type { Client } from 'discord.js';
 import type { Logger } from '@purinton/log';
 
@@ -8,7 +8,9 @@ export interface SetupEventsOptions {
   log?: Logger;
   msg?: (locale: string, key: string, defaultMsg?: string) => string;
   commandHandlers?: Record<string, (...args: any[]) => any>;
-  fsLib?: any;
+  fsLib?: {
+    readdirSync: (...args: any[]) => string[];
+  };
   importFn?: (path: string) => Promise<any>;
 }
 

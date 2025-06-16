@@ -4,12 +4,12 @@ import { readdirSync } from 'fs';
 
 /**
  * Loads and attaches all event handlers from the events directory to the Discord client.
- * @param {Object} options
- * @param {Object} options.client - The Discord client instance
+ * @param {Object} options - Options for setting up events
+ * @param {import('discord.js').Client} options.client - The Discord client instance
  * @param {string} options.eventsDir - Directory path for events
- * @param {Object} options.log - Logger instance
- * @param {Function} [options.msg] - Localization function (optional)
- * @param {Object} [options.commands] - Commands map (optional)
+ * @param {import('@purinton/log').Logger} [options.log] - Logger instance
+ * @param {Function} [options.msg] - Localization function (locale, key, defaultMsg?) => string (optional)
+ * @param {Object} [options.commandHandlers] - Map of command handlers (optional)
  * @param {Object} [options.fsLib] - File system library (for testing)
  * @param {Function} [options.importFn] - Function to import handlers (for testing)
  * @returns {Promise<{ loadedEvents: string[] }>} Object with loadedEvents array

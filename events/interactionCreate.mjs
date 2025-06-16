@@ -4,6 +4,6 @@ export default async function ({ client, log, msg, commandHandlers, ...contextDa
     const localeMsg = (key, defaultMsg) => msg(locale, key, defaultMsg, log);
     const handler = commandHandlers?.[interaction.commandName];
     if (handler) {
-        await handler(interaction, { client, log, msg: localeMsg, ...contextData });
+        await handler({ client, log, msg: localeMsg, ...contextData }, interaction);
     }
 }

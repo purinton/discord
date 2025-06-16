@@ -75,16 +75,11 @@ export const createDiscord = async ({
   });
 
   const { msg, loadedLocales } = await setupLocalesFn({ localesDir, log });
-  log.debug(`Loaded ${loadedLocales.length} locales...`);
-
   const { commandDefs, commandHandlers } = await setupCommandsFn({ client, commandsDir, log, msg });
   const registerSuccess = await registerCommandsFn({ commandDefs, client_id, token, log });
   if (!registerSuccess) throw new Error('Failed to register commands with Discord API. Please check your command definitions and token.');
-  log.debug(`Loaded ${commandDefs.length} commands...`);
-
   const { loadedEvents } = await setupEventsFn({ client, eventsDir, log, msg, commandHandlers, context });
-  log.info(`Loaded ${loadedEvents.length} events...`);
-
+  log.info(`Loaded ${loadedEvents.length} event(s), ${loadedLocales.length} locale(s), and ${Object.keys(commandDefs).length} command(s).`);
   try {
     await client.login(token);
   } catch (error) {

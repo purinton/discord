@@ -1,4 +1,4 @@
 // events/guildScheduledEventUserRemove.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('guildScheduledEventUserRemove', eventArgs);
+export default async function ({ log }, guildScheduledEvent, user) {
+    log.debug('guildScheduledEventUserRemove', { guildScheduledEvent, user });
 }

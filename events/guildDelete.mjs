@@ -1,4 +1,4 @@
 // events/guildDelete.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('guildDelete', eventArgs);
+export default async function ({ log }, guild) {
+    log.debug('guildDelete', { guild });
 }

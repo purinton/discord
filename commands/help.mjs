@@ -1,10 +1,10 @@
 // commands/help.mjs
-export default async function ({ log, localMsg, interaction }) {
-    log.debug(`${interaction.commandName} Request`, { interaction });
+export default async function (interaction, { log, msg }) {
+    log.debug('help Request', { interaction });
     const response = {
-        content: localMsg('help', 'This is the default help text.'),
+        content: msg('help', 'This is the default help text.'),
         flags: 1 << 6, // EPHEMERAL
     };
-    log.debug(`${interaction.commandName} Response`, { response });
+    log.debug('help Response', { response });
     await interaction.reply(response);
 }

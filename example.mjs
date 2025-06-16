@@ -6,20 +6,19 @@ import { createDiscord } from '@purinton/discord';
 
 (async () => {
     try {
-        const client = await createDiscord({
+        // Use rootDir for all subdirectories
+        await createDiscord({
             client_id: process.env.DISCORD_CLIENT_ID,
             token: process.env.DISCORD_TOKEN,
-            log,
-            localesDir: path(import.meta, 'locales'),
-            commandsDir: path(import.meta, 'commands'),
-            eventsDir: path(import.meta, 'events'),
+            rootDir: path(import.meta),
             intents: {
                 Guilds: true,
-                GuildMessages: true
+                GuildMessages: true,
+                MessageContent: true
             },
+            log
         });
-        console.log('Bot started:', client.user?.tag);
     } catch (err) {
-        console.error('Failed to start bot:', err);
+        log.error('Failed to start bot:', err);
     }
 })();

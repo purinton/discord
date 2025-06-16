@@ -1,4 +1,4 @@
 // events/applicationCommandCreate.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('applicationCommandCreate', eventArgs);
+export default async function ({ log }, ...args) {
+    log.debug('applicationCommandCreate', { args });
 }

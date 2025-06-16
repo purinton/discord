@@ -1,4 +1,4 @@
 // events/channelDelete.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('channelDelete', eventArgs);
+export default async function ({ log }, channel) {
+    log.debug('channelDelete', { channel });
 }

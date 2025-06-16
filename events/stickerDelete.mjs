@@ -1,4 +1,4 @@
 // events/stickerDelete.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('stickerDelete', eventArgs);
+export default async function ({ log }, sticker) {
+    log.debug('stickerDelete', { sticker });
 }

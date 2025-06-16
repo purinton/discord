@@ -1,4 +1,4 @@
 // events/roleUpdate.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('roleUpdate', eventArgs);
+export default async function ({ log }, oldRole, newRole) {
+    log.debug('roleUpdate', { oldRole, newRole });
 }

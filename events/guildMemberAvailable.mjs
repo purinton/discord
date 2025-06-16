@@ -1,4 +1,4 @@
 // events/guildMemberAvailable.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('guildMemberAvailable', eventArgs);
+export default async function ({ log }, member) {
+    log.debug('guildMemberAvailable', { member });
 }

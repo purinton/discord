@@ -1,4 +1,4 @@
 // events/rateLimit.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('rateLimit', eventArgs);
+export default async function ({ log }, rateLimitData) {
+    log.debug('rateLimit', { rateLimitData });
 }

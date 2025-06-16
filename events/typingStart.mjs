@@ -1,4 +1,4 @@
 // events/typingStart.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('typingStart', eventArgs);
+export default async function ({ log }, typing) {
+    log.debug('typingStart', { typing });
 }

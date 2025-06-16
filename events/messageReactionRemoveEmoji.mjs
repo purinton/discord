@@ -1,4 +1,4 @@
 // events/messageReactionRemoveEmoji.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('messageReactionRemoveEmoji', eventArgs);
+export default async function ({ log }, reaction) {
+    log.debug('messageReactionRemoveEmoji', { reaction });
 }

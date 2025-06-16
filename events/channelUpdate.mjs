@@ -1,4 +1,3 @@
-// events/channelUpdate.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('channelUpdate', eventArgs);
+export default async function ({ log }, oldChannel, newChannel) {
+    log.debug('channelUpdate', { oldChannel, newChannel });
 }

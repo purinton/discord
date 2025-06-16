@@ -1,4 +1,4 @@
 // events/guildCreate.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('guildCreate', eventArgs);
+export default async function ({ log }, guild) {
+    log.debug('guildCreate', { guild });
 }

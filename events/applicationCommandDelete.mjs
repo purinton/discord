@@ -1,4 +1,4 @@
 // events/applicationCommandDelete.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('applicationCommandDelete', eventArgs);
+export default async function ({ log }, ...args) {
+    log.debug('applicationCommandDelete', { args });
 }

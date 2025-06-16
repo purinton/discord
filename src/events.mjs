@@ -1,5 +1,5 @@
 import logger from '@purinton/log';
-import { path, pathUrl } from '@purinton/path';
+import { pathUrl } from '@purinton/path';
 import { readdirSync } from 'fs';
 
 /**
@@ -31,12 +31,13 @@ export const setupEvents = async ({
     for (const file of files) {
         const eventName = file.replace(/\.mjs$/, '');
         try {
-            const mod = await importFn(pathUrl(eventsDir, file));
+            const handler = await importFn(pathUrl(eventsDir, file));
             if (!client) throw new Error('Discord client is undefined');
-            if (typeof mod.default === 'function') {
+            if (typeof handler.default === 'function') {
                 client.on(eventName, (...eventArgs) => {
-                    // Pass the Discord client, logger, localization function, and commands to the handler context
-                    mod.default({ client, log, msg, commandHandlers, ...eventArgs });
+                    const context = { client, log, msg };
+                    if (eventName === 'interactionCreate') context.commandHandlers = commandHandlers;
+                    handler.default(context, ...eventArgs);
                 });
             }
             loadedEvents.push(eventName);

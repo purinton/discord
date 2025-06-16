@@ -1,4 +1,4 @@
 // events/shardReady.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('shardReady', eventArgs);
+export default async function ({ log }, id, unavailableGuilds) {
+    log.debug('shardReady', { id, unavailableGuilds });
 }

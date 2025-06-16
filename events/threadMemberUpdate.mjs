@@ -1,4 +1,4 @@
 // events/threadMemberUpdate.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('threadMemberUpdate', eventArgs);
+export default async function ({ log }, oldMember, newMember) {
+    log.debug('threadMemberUpdate', { oldMember, newMember });
 }

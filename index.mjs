@@ -2,7 +2,7 @@ import path from '@purinton/path';
 import logger from '@purinton/log';
 import { Client, GatewayIntentBits } from 'discord.js';
 import { setupEvents } from './src/events.mjs';
-import { setupCommands } from './src/commands.mjs';
+import { setupCommands, registerCommands } from './src/commands.mjs';
 import { setupLocales } from './src/locales.mjs';
 
 /**
@@ -12,9 +12,10 @@ import { setupLocales } from './src/locales.mjs';
  * @param {string} [options.client_id] - Discord application client ID
  * @param {string} [options.token] - Discord bot token
  * @param {Object} [options.log] - Logger instance
- * @param {string} [options.localesDir] - Directory path for locales
- * @param {string} [options.commandsDir] - Directory path for commands
- * @param {string} [options.eventsDir] - Directory path for events
+ * @param {string} [options.rootDir] - Root directory for events, commands, and locales
+ * @param {string} [options.localesDir] - Directory path for locales (overrides rootDir)
+ * @param {string} [options.commandsDir] - Directory path for commands (overrides rootDir)
+ * @param {string} [options.eventsDir] - Directory path for events (overrides rootDir)
  * @param {Object} [options.intents] - Object with boolean flags for Discord Gateway Intents (e.g., { Guilds: true, GuildMessages: true })
  * @param {Array} [options.partials] - Array of partials for the Discord client
  * @param {Object} [options.clientOptions] - Additional options for Discord client
@@ -28,9 +29,10 @@ export const createDiscord = async ({
   client_id = process.env.DISCORD_CLIENT_ID,
   token = process.env.DISCORD_TOKEN,
   log = logger,
-  localesDir = path(import.meta, 'locales'),
-  commandsDir = path(import.meta, 'commands'),
-  eventsDir = path(import.meta, 'events'),
+  rootDir = path(import.meta),
+  localesDir = path(rootDir, 'locales'),
+  commandsDir = path(rootDir, 'commands'),
+  eventsDir = path(rootDir, 'events'),
   intents = {
     Guilds: true,
     GuildMessages: true,
@@ -44,6 +46,7 @@ export const createDiscord = async ({
   ClientClass = Client,
   setupEventsFn = setupEvents,
   setupCommandsFn = setupCommands,
+  registerCommandsFn = registerCommands,
   setupLocalesFn = setupLocales,
 } = {}) => {
   if (!client_id) throw new Error('DISCORD_CLIENT_ID is not set. Please check your .env file.');
@@ -69,13 +72,15 @@ export const createDiscord = async ({
   });
 
   const { msg, loadedLocales } = await setupLocalesFn({ localesDir, log });
-  log.debug(`Loaded ${loadedLocales.length} locales...`);
+  log.info(`Loaded ${loadedLocales.length} locales...`);
 
   const { commandDefs, commandHandlers } = await setupCommandsFn({ client, commandsDir, log, msg });
-  log.debug(`Loaded ${Object.keys(commandDefs).length} commands...`);
+  const registerSuccess = await registerCommandsFn({ commandDefs, client_id, token, log });
+  if (!registerSuccess) throw new Error('Failed to register commands with Discord API. Please check your command definitions and token.');
+  log.info(`Loaded ${commandDefs.length} commands...`);
 
   const { loadedEvents } = await setupEventsFn({ client, eventsDir, log, msg, commandHandlers });
-  log.debug(`Loaded ${loadedEvents.length} events...`);
+  log.info(`Loaded ${loadedEvents.length} events...`);
 
   try {
     await client.login(token);

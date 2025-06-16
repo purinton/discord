@@ -1,4 +1,4 @@
 // events/guildMemberRemove.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('guildMemberRemove', eventArgs);
+export default async function ({ log }, member) {
+    log.debug('guildMemberRemove', { member });
 }

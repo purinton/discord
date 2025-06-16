@@ -1,4 +1,4 @@
 // events/shardResume.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('shardResume', eventArgs);
+export default async function ({ log }, id, replayedEvents) {
+    log.debug('shardResume', { id, replayedEvents });
 }

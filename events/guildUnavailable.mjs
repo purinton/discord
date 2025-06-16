@@ -1,4 +1,4 @@
 // events/guildUnavailable.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('guildUnavailable', eventArgs);
+export default async function ({ log }, guild) {
+    log.debug('guildUnavailable', { guild });
 }

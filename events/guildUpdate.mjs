@@ -1,4 +1,4 @@
 // events/guildUpdate.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('guildUpdate', eventArgs);
+export default async function ({ log }, oldGuild, newGuild) {
+    log.debug('guildUpdate', { oldGuild, newGuild });
 }

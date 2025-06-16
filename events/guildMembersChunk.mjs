@@ -1,4 +1,4 @@
 // events/guildMembersChunk.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('guildMembersChunk', eventArgs);
+export default async function ({ log }, members, guild, chunk) {
+    log.debug('guildMembersChunk', { members, guild, chunk });
 }

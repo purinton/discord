@@ -1,4 +1,4 @@
 // events/presenceUpdate.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('presenceUpdate', eventArgs);
+export default async function ({ log }, oldPresence, newPresence) {
+    log.debug('presenceUpdate', { oldPresence, newPresence });
 }

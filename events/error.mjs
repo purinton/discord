@@ -1,4 +1,4 @@
 // events/error.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('error', eventArgs);
+export default async function ({ log }, error) {
+    log.error('error', { error });
 }

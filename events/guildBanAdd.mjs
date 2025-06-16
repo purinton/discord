@@ -1,4 +1,4 @@
 // events/guildBanAdd.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('guildBanAdd', eventArgs);
+export default async function ({ log }, ban) {
+    log.debug('guildBanAdd', { ban });
 }

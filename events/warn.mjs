@@ -1,4 +1,4 @@
 // events/warn.mjs
-export default async function ({ client, log, msg, ...eventArgs }) {
-    log.debug('warn', eventArgs);
+export default async function ({ log }, warn) {
+    log.warn('warn', { warn });
 }

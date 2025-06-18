@@ -1,7 +1,7 @@
 {
     "name": "@purinton/discord",
     "type": "module",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "A modular, extensible Discord app framework for Node.js with slash command, localization, and event-driven support.",
     "module": "index.mjs",
     "types": "index.d.ts",
@@ -67,7 +67,7 @@
         ]
     },
     "dependencies": {
-        "@purinton/common": "^1.0.14",
+        "@purinton/common": "^1.0.16",
         "discord.js": "^14.20.0",
         "dotenv": "^16.5.0"
     }

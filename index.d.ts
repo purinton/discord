@@ -16,11 +16,28 @@ export interface CreateDiscordOptions {
   eventsDir?: string;
   intents?: {
     Guilds?: boolean;
+    GuildMembers?: boolean; // privileged
+    GuildModeration?: boolean;
+    GuildBans?: boolean; // deprecated alias
+    GuildExpressions?: boolean;
+    GuildEmojisAndStickers?: boolean; // deprecated alias
+    GuildIntegrations?: boolean;
+    GuildWebhooks?: boolean;
+    GuildInvites?: boolean;
+    GuildVoiceStates?: boolean; // privileged
+    GuildPresences?: boolean; // privileged
     GuildMessages?: boolean;
-    MessageContent?: boolean;
-    GuildMembers?: boolean;
-    GuildPresences?: boolean;
-    GuildVoiceStates?: boolean;
+    GuildMessageReactions?: boolean;
+    GuildMessageTyping?: boolean;
+    DirectMessages?: boolean;
+    DirectMessageReactions?: boolean;
+    DirectMessageTyping?: boolean;
+    MessageContent?: boolean; // privileged
+    GuildScheduledEvents?: boolean;
+    AutoModerationConfiguration?: boolean;
+    AutoModerationExecution?: boolean;
+    GuildMessagePolls?: boolean;
+    DirectMessagePolls?: boolean;
     [key: string]: boolean | undefined;
   };
   partials?: string[];

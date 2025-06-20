@@ -9,11 +9,7 @@ import { createDiscord } from '@purinton/discord';
     const client = await createDiscord({
         log,
         rootDir: path(import.meta),
-        intents: {
-            Guilds: true,
-            GuildMessages: true,
-            MessageContent: true
-        },
+        intents: { MessageContent: true },
         context: {
             presence: { activities: [{ name: 'example', type: 4 }], status: 'online' },
             // Add your context options here (db, redis, etc.)

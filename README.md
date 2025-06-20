@@ -46,23 +46,15 @@ import log from '@purinton/log';
 import path from '@purinton/path';
 import { createDiscord } from '@purinton/discord';
 
-(async () => {
-  try {
-    await createDiscord({
-      client_id: process.env.DISCORD_CLIENT_ID,
-      token: process.env.DISCORD_TOKEN,
-      rootDir: path(import.meta),
-      intents: {
-        Guilds: true,
-        GuildMessages: true,
-        MessageContent: true
-      },
-      log
-    });
-  } catch (err) {
+try {
+  await createDiscord({
+    log,
+    rootDir: path(import.meta),
+    intents: { MessageContent: true }
+  });
+} catch (err) {
     log.error('Failed to start app:', err);
-  }
-})();
+}
 ```
 
 ### CommonJS Example
@@ -76,15 +68,9 @@ const { createDiscord } = require('@purinton/discord');
 (async () => {
   try {
     await createDiscord({
-      client_id: process.env.DISCORD_CLIENT_ID,
-      token: process.env.DISCORD_TOKEN,
+      log,
       rootDir: path(__filename),
-      intents: {
-        Guilds: true,
-        GuildMessages: true,
-        MessageContent: true
-      },
-      log
+      intents: { MessageContent: true }
     });
   } catch (err) {
     log.error('Failed to start app:', err);

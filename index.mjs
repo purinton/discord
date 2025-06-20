@@ -35,13 +35,31 @@ export const createDiscord = async ({
   localesDir = path(rootDir, 'locales'),
   commandsDir = path(rootDir, 'commands'),
   eventsDir = path(rootDir, 'events'),
+  // All non-privileged intents default to true, privileged to false
   intents = {
     Guilds: true,
+    GuildMembers: false, // privileged
+    GuildModeration: true,
+    GuildBans: true, // deprecated alias, same as GuildModeration
+    GuildExpressions: true,
+    GuildEmojisAndStickers: true, // deprecated alias, same as GuildExpressions
+    GuildIntegrations: true,
+    GuildWebhooks: true,
+    GuildInvites: true,
+    GuildVoiceStates: false, // privileged
+    GuildPresences: false, // privileged
     GuildMessages: true,
-    MessageContent: false,
-    GuildMembers: false,
-    GuildPresences: false,
-    GuildVoiceStates: false
+    GuildMessageReactions: true,
+    GuildMessageTyping: true,
+    DirectMessages: true,
+    DirectMessageReactions: true,
+    DirectMessageTyping: true,
+    MessageContent: false, // privileged
+    GuildScheduledEvents: true,
+    AutoModerationConfiguration: true,
+    AutoModerationExecution: true,
+    GuildMessagePolls: true,
+    DirectMessagePolls: true
   },
   partials = ['MESSAGE', 'CHANNEL', 'REACTION'],
   context = {},
@@ -57,11 +75,28 @@ export const createDiscord = async ({
 
   const INTENT_MAP = {
     Guilds: GatewayIntentBits.Guilds,
-    GuildMessages: GatewayIntentBits.GuildMessages,
-    MessageContent: GatewayIntentBits.MessageContent,
     GuildMembers: GatewayIntentBits.GuildMembers,
-    GuildPresences: GatewayIntentBits.GuildPresences,
+    GuildModeration: GatewayIntentBits.GuildModeration,
+    GuildBans: GatewayIntentBits.GuildBans,
+    GuildExpressions: GatewayIntentBits.GuildExpressions,
+    GuildEmojisAndStickers: GatewayIntentBits.GuildEmojisAndStickers,
+    GuildIntegrations: GatewayIntentBits.GuildIntegrations,
+    GuildWebhooks: GatewayIntentBits.GuildWebhooks,
+    GuildInvites: GatewayIntentBits.GuildInvites,
     GuildVoiceStates: GatewayIntentBits.GuildVoiceStates,
+    GuildPresences: GatewayIntentBits.GuildPresences,
+    GuildMessages: GatewayIntentBits.GuildMessages,
+    GuildMessageReactions: GatewayIntentBits.GuildMessageReactions,
+    GuildMessageTyping: GatewayIntentBits.GuildMessageTyping,
+    DirectMessages: GatewayIntentBits.DirectMessages,
+    DirectMessageReactions: GatewayIntentBits.DirectMessageReactions,
+    DirectMessageTyping: GatewayIntentBits.DirectMessageTyping,
+    MessageContent: GatewayIntentBits.MessageContent,
+    GuildScheduledEvents: GatewayIntentBits.GuildScheduledEvents,
+    AutoModerationConfiguration: GatewayIntentBits.AutoModerationConfiguration,
+    AutoModerationExecution: GatewayIntentBits.AutoModerationExecution,
+    GuildMessagePolls: GatewayIntentBits.GuildMessagePolls,
+    DirectMessagePolls: GatewayIntentBits.DirectMessagePolls
   };
 
   const resolvedIntents = Object.entries(intents)

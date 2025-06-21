@@ -40,13 +40,11 @@ export const createDiscord = async ({
     Guilds: true,
     GuildMembers: false, // privileged
     GuildModeration: true,
-    GuildBans: true, // deprecated alias, same as GuildModeration
     GuildExpressions: true,
-    GuildEmojisAndStickers: true, // deprecated alias, same as GuildExpressions
     GuildIntegrations: true,
     GuildWebhooks: true,
     GuildInvites: true,
-    GuildVoiceStates: false, // privileged
+    GuildVoiceStates: true,
     GuildPresences: false, // privileged
     GuildMessages: true,
     GuildMessageReactions: true,

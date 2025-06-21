@@ -56,3 +56,12 @@ export interface CreateDiscordOptions {
  * @returns Promise resolving to a Discord.js Client instance
  */
 export function createDiscord(options?: CreateDiscordOptions): Promise<Client>;
+
+/**
+ * Splits a message into chunks of up to maxLength characters, attempting to split at newlines or periods for readability.
+ *
+ * @param msg The message to split
+ * @param maxLength The maximum length of each chunk (default: 2000)
+ * @returns An array of message chunks, each no longer than maxLength
+ */
+export function splitMsg(msg: string, maxLength?: number): string[];

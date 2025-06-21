@@ -145,3 +145,29 @@ export const createDiscord = async ({
   }
   return client;
 };
+
+/**
+ * Splits a message into chunks of up to maxLength characters, attempting to split at newlines or periods for readability.
+ *
+ * @param {string} msg - The message to split
+ * @param {number} [maxLength=2000] - The maximum length of each chunk (default: 2000)
+ * @returns {string[]} An array of message chunks, each no longer than maxLength
+ */
+export function splitMsg(msg, maxLength = 2000) {
+    msg = msg.trim();
+    if (msg === '') return [];
+    if (msg.length <= maxLength) return [msg];
+    const chunks = [];
+    while (msg.length > maxLength) {
+        let chunk = msg.slice(0, maxLength);
+        let splitIndex = chunk.lastIndexOf('\n');
+        if (splitIndex === -1) splitIndex = chunk.lastIndexOf('.');
+        if (splitIndex === -1 || splitIndex < 1) splitIndex = maxLength;
+        else splitIndex++;
+        let part = msg.slice(0, splitIndex).trim();
+        chunks.push(part);
+        msg = msg.slice(splitIndex).trim();
+    }
+    if (msg !== '') chunks.push(msg);
+    return chunks;
+}

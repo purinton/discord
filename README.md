@@ -102,6 +102,14 @@ Creates and logs in a Discord client, auto-registers commands, loads event handl
 
 Returns: A logged-in Discord.js `Client` instance.
 
+### `splitMsg(msg, maxLength = 2000): string[]`
+
+Splits a message into chunks of up to `maxLength` characters, attempting to split at newlines or periods for readability.
+
+- `msg` (string): The message to split
+- `maxLength` (number, optional): The maximum length of each chunk (default: 2000)
+- **Returns:** An array of message chunks, each no longer than `maxLength`.
+
 ### Command and Event Structure
 
 - **Commands:**  

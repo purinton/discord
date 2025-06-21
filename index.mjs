@@ -1,6 +1,6 @@
 import path from '@purinton/path';
 import logger from '@purinton/log';
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits, Partials } from 'discord.js';
 import { setupEvents } from './src/events.mjs';
 import { setupCommands, registerCommands } from './src/commands.mjs';
 import { setupLocales } from './src/locales.mjs';
@@ -51,6 +51,22 @@ const DEFAULT_INTENTS = {
   DirectMessagePolls: true
 };
 
+const DEFAULT_PARTIALS = {
+  Message: true,
+  Channel: true,
+  Reaction: true
+};
+
+const PARTIALS_MAP = {
+  Message: Partials.Message,
+  Channel: Partials.Channel,
+  Reaction: Partials.Reaction,
+  GuildMember: Partials.GuildMember,
+  User: Partials.User,
+  ThreadMember: Partials.ThreadMember,
+  GuildScheduledEvent: Partials.GuildScheduledEvent
+};
+
 export const createDiscord = async ({
   client_id = process.env.DISCORD_CLIENT_ID,
   token = process.env.DISCORD_TOKEN,
@@ -60,7 +76,7 @@ export const createDiscord = async ({
   commandsDir = path(rootDir, 'commands'),
   eventsDir = path(rootDir, 'events'),
   intents = undefined,
-  partials = ['MESSAGE', 'CHANNEL', 'REACTION'],
+  partials = undefined,
   context = {},
   clientOptions = {},
   ClientClass = Client,
@@ -104,9 +120,15 @@ export const createDiscord = async ({
     .filter(([key, value]) => value && INTENT_MAP[key])
     .map(([key]) => INTENT_MAP[key]);
 
+  // Merge user partials with defaults and map to Partials enum
+  const mergedPartials = { ...DEFAULT_PARTIALS, ...(partials || {}) };
+  const resolvedPartials = Object.entries(mergedPartials)
+    .filter(([key, value]) => value && PARTIALS_MAP[key])
+    .map(([key]) => PARTIALS_MAP[key]);
+
   const client = new ClientClass({
     intents: resolvedIntents,
-    partials,
+    partials: resolvedPartials,
     ...clientOptions
   });
 

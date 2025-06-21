@@ -73,3 +73,38 @@ describe('createDiscord', () => {
     expect(logger.error).not.toHaveBeenCalled(); // Error is thrown, not logged
   });
 });
+
+describe('splitMsg', () => {
+  let splitMsg;
+  beforeAll(async () => {
+    ({ splitMsg } = await import('../index.mjs'));
+  });
+
+  it('returns an empty array for empty string', () => {
+    expect(splitMsg('')).toEqual([]);
+  });
+
+  it('returns the original string in an array if under maxLength', () => {
+    expect(splitMsg('hello', 10)).toEqual(['hello']);
+  });
+
+  it('splits at newlines if possible', () => {
+    const msg = 'line1\nline2\nline3';
+    expect(splitMsg(msg, 6)).toEqual(['line1', 'line2', 'line3']);
+  });
+
+  it('splits at periods if no newline is found', () => {
+    const msg = 'abc.def.ghi';
+    expect(splitMsg(msg, 5)).toEqual(['abc.', 'def.', 'ghi']);
+  });
+
+  it('splits at maxLength if no newline or period is found', () => {
+    const msg = 'abcdefghij';
+    expect(splitMsg(msg, 3)).toEqual(['abc', 'def', 'ghi', 'j']);
+  });
+
+  it('trims whitespace from each chunk', () => {
+    const msg = '  abc  def  ';
+    expect(splitMsg(msg, 3)).toEqual(['abc', 'def']);
+  });
+});

@@ -27,6 +27,30 @@ import { setupLocales } from './src/locales.mjs';
  * @param {Function} [options.setupLocalesFn] - Function to set up locales (for dependency injection/testing)
  * @returns {Promise<import('discord.js').Client>} Discord client instance
  */
+const DEFAULT_INTENTS = {
+  Guilds: true,
+  GuildMembers: false, // privileged
+  GuildModeration: true,
+  GuildExpressions: true,
+  GuildIntegrations: true,
+  GuildWebhooks: true,
+  GuildInvites: true,
+  GuildVoiceStates: true,
+  GuildPresences: false, // privileged
+  GuildMessages: true,
+  GuildMessageReactions: true,
+  GuildMessageTyping: true,
+  DirectMessages: true,
+  DirectMessageReactions: true,
+  DirectMessageTyping: true,
+  MessageContent: false, // privileged
+  GuildScheduledEvents: true,
+  AutoModerationConfiguration: true,
+  AutoModerationExecution: true,
+  GuildMessagePolls: true,
+  DirectMessagePolls: true
+};
+
 export const createDiscord = async ({
   client_id = process.env.DISCORD_CLIENT_ID,
   token = process.env.DISCORD_TOKEN,
@@ -35,30 +59,7 @@ export const createDiscord = async ({
   localesDir = path(rootDir, 'locales'),
   commandsDir = path(rootDir, 'commands'),
   eventsDir = path(rootDir, 'events'),
-  // All non-privileged intents default to true, privileged to false
-  intents = {
-    Guilds: true,
-    GuildMembers: false, // privileged
-    GuildModeration: true,
-    GuildExpressions: true,
-    GuildIntegrations: true,
-    GuildWebhooks: true,
-    GuildInvites: true,
-    GuildVoiceStates: true,
-    GuildPresences: false, // privileged
-    GuildMessages: true,
-    GuildMessageReactions: true,
-    GuildMessageTyping: true,
-    DirectMessages: true,
-    DirectMessageReactions: true,
-    DirectMessageTyping: true,
-    MessageContent: false, // privileged
-    GuildScheduledEvents: true,
-    AutoModerationConfiguration: true,
-    AutoModerationExecution: true,
-    GuildMessagePolls: true,
-    DirectMessagePolls: true
-  },
+  intents = undefined,
   partials = ['MESSAGE', 'CHANNEL', 'REACTION'],
   context = {},
   clientOptions = {},
@@ -97,7 +98,9 @@ export const createDiscord = async ({
     DirectMessagePolls: GatewayIntentBits.DirectMessagePolls
   };
 
-  const resolvedIntents = Object.entries(intents)
+  // Merge user intents with defaults
+  const mergedIntents = { ...DEFAULT_INTENTS, ...(intents || {}) };
+  const resolvedIntents = Object.entries(mergedIntents)
     .filter(([key, value]) => value && INTENT_MAP[key])
     .map(([key]) => INTENT_MAP[key]);
 
